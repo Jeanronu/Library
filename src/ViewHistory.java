@@ -1,34 +1,33 @@
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Stack;
 
 public class ViewHistory {
-    private Stack<String> history;
+    private Stack<String> historyStack;
     private String filename;
-    private JLabel historyLabel;
-    private JLabel titleLabel;
 
     public ViewHistory(String filename) {
         this.filename = filename;
-        history = new Stack<>();
+        historyStack = new Stack<>();
     }
 
     public void addBook(String bookTitle) {
-        history.push(bookTitle);
+        historyStack.push(bookTitle);
         saveHistory();
     }
 
     public void clearHistory() {
-        history.clear();
+        while (!historyStack.isEmpty()) {
+            historyStack.pop();
+        }
         saveHistory();
     }
 
     public String getHistory() {
         StringBuilder sb = new StringBuilder();
-        for (String bookTitle : history) {
+        for (int i = historyStack.size() - 1; i >= 0; i--) {
+            String bookTitle = historyStack.peek(i);
             sb.append(bookTitle).append("\n");
         }
         return sb.toString();
@@ -44,7 +43,7 @@ public class ViewHistory {
             BufferedReader br = new BufferedReader(fr);
             String line;
             while ((line = br.readLine()) != null) {
-                history.push(line);
+                historyStack.push(line);
             }
             br.close();
             fr.close();
@@ -56,7 +55,8 @@ public class ViewHistory {
     public void saveHistory() {
         try {
             FileWriter fw = new FileWriter(filename);
-            for (String bookTitle : history) {
+            for (int i = historyStack.size() - 1; i >= 0; i--) {
+                String bookTitle = historyStack.peek(i);
                 fw.write(bookTitle + "\n");
             }
             fw.close();

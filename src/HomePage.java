@@ -1,7 +1,8 @@
 import javax.swing.*;
 import java.awt.event.*;
+import javax.swing.JFrame;
 
-public class HomePage {
+public class HomePage extends JFrame {
     private JComboBox Browse;
     private JTextField searchTextField;
     private JButton searchButton;
@@ -53,6 +54,12 @@ public class HomePage {
             // Change the "Trend stories" by the "option" you pick
             public void actionPerformed(ActionEvent e) {
                 stories.setText("" + Browse.getSelectedItem() + " stories~");
+            }
+        });
+
+        button1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new HistoryGUI();
             }
         });
     }
