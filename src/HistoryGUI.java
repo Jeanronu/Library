@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 
 public class HistoryGUI extends JFrame {
     private JTextArea historyTextArea;
@@ -21,17 +22,6 @@ public class HistoryGUI extends JFrame {
     public HistoryGUI() {
         super("Book History");
 
-        menuBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String selectedOption = (String) menuBox.getSelectedItem();
-                assert selectedOption != null;
-                if (selectedOption.equals("Home")) {
-                    HomePage homePage = new HomePage();
-                }
-            }
-        });
-
         // Create the view history object with the history label and filename
         String filename = "book_history.csv";
         history = new ViewHistory(filename);
@@ -44,18 +34,6 @@ public class HistoryGUI extends JFrame {
         // Create a panel for the buttons
         buttonPanel = new JPanel();
 
-        // Create a button to add a book to the history
-        addButton = new JButton("Add Book");
-        addButton.setPreferredSize(new Dimension(100, 30));
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String bookTitle = "New Book";
-                history.addBook(bookTitle);
-                historyTextArea.setText(history.getHistory());
-            }
-        });
-        buttonPanel.add(addButton);
-
         // Create a button to clear the history
         clearButton = new JButton("Clear History");
         clearButton.setPreferredSize(new Dimension(120, 30));
@@ -66,6 +44,22 @@ public class HistoryGUI extends JFrame {
             }
         });
         buttonPanel.add(clearButton);
+
+        // Create a button to add a book
+        addButton = new JButton("Add Book");
+        addButton.setPreferredSize(new Dimension(120, 30));
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Book book = BookDisplay.getBook();
+                history.addBook(book);
+                history.saveHistory(); // Save the history to the CSV file
+                historyTextArea.setText(history.getHistory());
+                book.isRead();
+            }
+        });
+        buttonPanel.add(addButton);
+
 
         // Create a scrollable text area for the history
         historyTextArea = new JTextArea();
@@ -94,8 +88,6 @@ public class HistoryGUI extends JFrame {
                     frame.setVisible(true);
                 } else if (selectedOption.equals("Search")) {
                     // Open the Option2 window
-                    HomePage option2Window = new HomePage();
-                    option2Window.setVisible(true);
                 }
             }
         });
@@ -157,7 +149,7 @@ public class HistoryGUI extends JFrame {
         setVisible(true);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Check if the CSV file exists and create it if it doesn't
         String filename = "book_history.csv";
         File file = new File(filename);

@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import javax.swing.*;
 
 public class HomePageGUI {
@@ -70,6 +72,32 @@ public class HomePageGUI {
         JPanel bookPanel5 = new JPanel();
         bookPanel5.setPreferredSize(new Dimension(200, 300));
         bookPanel5.setBackground(Color.LIGHT_GRAY);
+
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String[] files = {"Book_data/Book1.csv"};
+                Library library = null;
+                try {
+                    library = new Library(files);
+                } catch (FileNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                Book book = Main.randomBook(library);
+                BookDisplay bookDisplay = null;
+                try {
+                    bookDisplay = new BookDisplay(book);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                bookPanel1.removeAll();
+                bookPanel1.add(bookDisplay.rootPanel);
+                bookPanel1.revalidate();
+                bookPanel1.repaint();
+            }
+        });
 
         // Add the components to the content pane
         contentPane = new JPanel();

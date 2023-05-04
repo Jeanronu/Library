@@ -1,19 +1,18 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
+import java.util.*;
 
 public class ViewHistory {
-    private Stack<String> historyStack;
-    private String filename;
+    private String filename = "book_history.csv";
+    private Stack<Book> historyStack;
 
     public ViewHistory(String filename) {
         this.filename = filename;
         historyStack = new Stack<>();
+        loadHistory();
     }
 
-    public void addBook(String bookTitle) {
-        historyStack.push(bookTitle);
+    public void addBook(Book book) {
+        historyStack.push(book);
         saveHistory();
     }
 
@@ -26,40 +25,49 @@ public class ViewHistory {
 
     public String getHistory() {
         StringBuilder sb = new StringBuilder();
-        for (int i = historyStack.size() - 1; i >= 0; i--) {
-            String bookTitle = historyStack.peek(i);
-            sb.append(bookTitle).append("\n");
+        for (Book book : historyStack) {
+            sb.append(book.getTitle()).append("\n");
         }
         return sb.toString();
     }
 
-    public void loadHistory() {
+    void loadHistory() {
         try {
-            File file = new File(filename);
-            if (!file.exists()) {
-                return;
+            FileReader fileReader = new FileReader(filename);
+            CSVReader csvReader = new CSVReader();
+            ArrayList<String[]> lines = csvReader.read(fileReader);
+            ArrayList<Book> books = new ArrayList<>();
+            BookFinder bookFinder = new BookFinder(books);
+            for (String[] line : lines) {
+                Book book = bookFinder.getBookByTitle(line[0]);
+                if (book != null) {
+                    historyStack.push(book);
+                }
             }
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            String line;
-            while ((line = br.readLine()) != null) {
-                historyStack.push(line);
-            }
-            br.close();
-            fr.close();
+            fileReader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void saveHistory() {
+    void saveHistory() {
         try {
-            FileWriter fw = new FileWriter(filename);
-            for (int i = historyStack.size() - 1; i >= 0; i--) {
-                String bookTitle = historyStack.peek(i);
-                fw.write(bookTitle + "\n");
+            List<String> titles = new ArrayList<>();
+            FileReader fileReader = new FileReader(filename);
+            CSVReader csvReader = new CSVReader();
+            ArrayList<String[]> lines = csvReader.read(fileReader);
+            for (String[] line : lines) {
+                titles.add(line[0]);
             }
-            fw.close();
+            fileReader.close();
+
+            FileWriter writer = new FileWriter(filename, true);
+            for (Book book : historyStack) {
+                if (!titles.contains(book.getTitle())) {
+                    writer.write(book.getTitle() + "\n");
+                }
+            }
+            writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

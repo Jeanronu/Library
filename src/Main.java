@@ -1,47 +1,31 @@
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.image.AreaAveragingScaleFilter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
-public class Main extends JFrame {
-    private JComboBox<String> menuBox;
-
-    public Main() {
-        super("Main Window");
-
-        // Create a menu with options
-        menuBox = new JComboBox<>(new String[]{"Home", "Option 1", "Option 2"});
-        JPanel panel = new JPanel();
-        panel.add(menuBox);
-
-        // Add an ActionListener to the menuBox
-        menuBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String selectedOption = (String) menuBox.getSelectedItem();
-                if (selectedOption != null && selectedOption.equals("Home")) {
-                    // Open the Home window
-                } else if (selectedOption != null && selectedOption.equals("Option 1")) {
-                    // Open the Option1 window
-                    HistoryGUI option1Window = new HistoryGUI();
-                    option1Window.setVisible(true);
-                } else if (selectedOption != null && selectedOption.equals("Option 2")) {
-                    // Open the Option2 window
-                    HomePage option2Window = new HomePage();
-                    option2Window.setVisible(true);
-                }
-            }
-        });
-
-
-        // Set up the main window
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        getContentPane().add(panel);
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
+public class Main {
+    public static void main(String[] args) throws IOException {
+        String[] files = {"Book_data/Book1.csv"};
+        Library library = new Library(files);
+        ArrayList<Book> bookLibrary = library.getLibrary();
+        Stack<Book> readHistory = new Stack<>();
+        Book one = bookLibrary.get(1453);
+        one.setRead();
+        one.setPersonalRating(2);
+        readHistory.push(one);
+        Book two = bookLibrary.get(967);
+        two.setRead();
+        two.setPersonalRating(5);
+        readHistory.push(two);
+        Book three = bookLibrary.get(89);
+        three.setPersonalRating(3);
+        readHistory.push(three);
     }
 
-    public static void main(String[] args) {
-        new Main();
+    public static Book randomBook(Library library) {
+        int randomIndex = (int) (Math.random() * library.getSize());
+        return library.getBook(randomIndex);
     }
 }
