@@ -73,32 +73,6 @@ public class HomePageGUI {
         bookPanel5.setPreferredSize(new Dimension(200, 300));
         bookPanel5.setBackground(Color.LIGHT_GRAY);
 
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String[] files = {"Book_data/Book1.csv"};
-                Library library = null;
-                try {
-                    library = new Library(files);
-                } catch (FileNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                Book book = Main.randomBook(library);
-                BookDisplay bookDisplay = null;
-                try {
-                    bookDisplay = new BookDisplay(book);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                bookPanel1.removeAll();
-                bookPanel1.add(bookDisplay.rootPanel);
-                bookPanel1.revalidate();
-                bookPanel1.repaint();
-            }
-        });
-
         // Add the components to the content pane
         contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
@@ -120,6 +94,80 @@ public class HomePageGUI {
         bookPanelContainer.add(bookPanel5);
         contentPane.add(bookPanelContainer);
         contentPane.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Perform the book when the window is loaded
+        String[] files = {"Book_data/Book1.csv"};
+        Library library = null;
+        try {
+            library = new Library(files);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        // Book 1
+        Book book1 = Main.randomBook(library);
+        BookDisplay bookDisplay1 = null;
+        try {
+            bookDisplay1 = new BookDisplay(book1);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        bookPanel1.removeAll();
+        bookPanel1.add(bookDisplay1.rootPanel);
+        bookPanel1.revalidate();
+        bookPanel1.repaint();
+
+        // Book 2
+        Book book2 = Main.randomBook(library);
+        BookDisplay bookDisplay2 = null;
+        try {
+            bookDisplay2 = new BookDisplay(book2);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        bookPanel2.removeAll();
+        bookPanel2.add(bookDisplay2.rootPanel);
+        bookPanel2.revalidate();
+        bookPanel2.repaint();
+
+        // Book 3
+        Book book3 = Main.randomBook(library);
+        BookDisplay bookDisplay3 = null;
+        try {
+            bookDisplay3 = new BookDisplay(book3);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        bookPanel3.removeAll();
+        bookPanel3.add(bookDisplay3.rootPanel);
+        bookPanel3.revalidate();
+        bookPanel3.repaint();
+
+        // Book 4
+        Book book4 = Main.randomBook(library);
+        BookDisplay bookDisplay4 = null;
+        try {
+            bookDisplay4 = new BookDisplay(book4);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        bookPanel4.removeAll();
+        bookPanel4.add(bookDisplay4.rootPanel);
+        bookPanel4.revalidate();
+        bookPanel4.repaint();
+
+        // Book 5
+        Book book5 = Main.randomBook(library);
+        BookDisplay bookDisplay5 = null;
+        try {
+            bookDisplay5 = new BookDisplay(book5);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        bookPanel5.removeAll();
+        bookPanel5.add(bookDisplay5.rootPanel);
+        bookPanel5.revalidate();
+        bookPanel5.repaint();
 
         // Set the content pane and show the frame
         frame.setContentPane(contentPane);

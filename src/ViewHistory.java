@@ -13,6 +13,8 @@ public class ViewHistory {
 
     public void addBook(Book book) {
         historyStack.push(book);
+        book.setRead();
+        saveBookToHistory(book);
         saveHistory();
     }
 
@@ -20,7 +22,7 @@ public class ViewHistory {
         while (!historyStack.isEmpty()) {
             historyStack.pop();
         }
-        saveHistory();
+        clearBookHistory();
     }
 
     public String getHistory() {
@@ -45,6 +47,26 @@ public class ViewHistory {
                 }
             }
             fileReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void saveBookToHistory(Book book) {
+        try {
+            FileWriter writer = new FileWriter(filename, true);
+            writer.write(book.getTitle() + "\n");
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void clearBookHistory() {
+        try {
+            FileWriter writer = new FileWriter(filename);
+            writer.write("");
+            writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
