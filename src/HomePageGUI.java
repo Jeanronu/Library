@@ -1,12 +1,13 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.*;
 
 public class HomePageGUI {
     private JFrame frame;
     private JPanel contentPane;
+    private ViewHistory history;
 
     public HomePageGUI(JFrame frame) {
         this.frame = frame;
@@ -58,26 +59,26 @@ public class HomePageGUI {
         JButton searchButton = new JButton("Search");
 
         JPanel bookPanel1 = new JPanel();
-        bookPanel1.setPreferredSize(new Dimension(200, 300));
+        bookPanel1.setPreferredSize(new Dimension(200, 400));
         bookPanel1.setBackground(Color.LIGHT_GRAY);
         JPanel bookPanel2 = new JPanel();
-        bookPanel2.setPreferredSize(new Dimension(200, 300));
+        bookPanel2.setPreferredSize(new Dimension(200, 400));
         bookPanel2.setBackground(Color.LIGHT_GRAY);
         JPanel bookPanel3 = new JPanel();
-        bookPanel3.setPreferredSize(new Dimension(200, 300));
+        bookPanel3.setPreferredSize(new Dimension(200, 400));
         bookPanel3.setBackground(Color.LIGHT_GRAY);
         JPanel bookPanel4 = new JPanel();
-        bookPanel4.setPreferredSize(new Dimension(200, 300));
+        bookPanel4.setPreferredSize(new Dimension(200, 400));
         bookPanel4.setBackground(Color.LIGHT_GRAY);
         JPanel bookPanel5 = new JPanel();
-        bookPanel5.setPreferredSize(new Dimension(200, 300));
+        bookPanel5.setPreferredSize(new Dimension(200, 400));
         bookPanel5.setBackground(Color.LIGHT_GRAY);
 
         // Add the components to the content pane
         contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
         contentPane.add(Box.createRigidArea(new Dimension(0, 10)));
-        contentPane.add(welcomeLabel);
+        contentPane.add(welcomeLabel, FlowLayout.CENTER);
         contentPane.add(Box.createRigidArea(new Dimension(0, 10)));
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         searchPanel.add(menuBox);
@@ -96,6 +97,7 @@ public class HomePageGUI {
         contentPane.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Perform the book when the window is loaded
+        history = new ViewHistory("book_history.csv");
         String[] files = {"Book_data/Book1.csv"};
         Library library = null;
         try {
@@ -112,10 +114,32 @@ public class HomePageGUI {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        bookPanel1.removeAll();
-        bookPanel1.add(bookDisplay1.rootPanel);
-        bookPanel1.revalidate();
-        bookPanel1.repaint();
+        bookPanel1.setLayout(new BorderLayout());
+        bookPanel1.add(bookDisplay1.rootPanel, BorderLayout.CENTER);
+        JButton addButton1 = new JButton("Add Book");
+        addButton1.setPreferredSize(new Dimension(120, 30));
+        addButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Book book = book1;
+                if (history.containsBook(book)) {
+                    JOptionPane.showMessageDialog(contentPane, "This book is already in the history.");
+                } else {
+                    book.setRead(); // Call isRead on the book object before adding it to the history
+                    history.addBook(book);
+                    history.saveHistory(); // Save the history to the CSV file
+
+                    // Append the book to the book_history.csv file
+                    try (FileWriter writer = new FileWriter("book_history.csv", true)) {
+                        writer.write(String.format("%s,%s,%s,%d\n", book.getTitle(), book.getAuthors(), book.getCategories(), book.getISBN10()));
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
+        bookPanel1.add(addButton1, BorderLayout.SOUTH);
+        bookPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // Book 2
         Book book2 = Main.randomBook(library);
@@ -125,10 +149,26 @@ public class HomePageGUI {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        bookPanel2.removeAll();
-        bookPanel2.add(bookDisplay2.rootPanel);
-        bookPanel2.revalidate();
-        bookPanel2.repaint();
+        bookPanel2.setLayout(new BorderLayout());
+        bookPanel2.add(bookDisplay2.rootPanel, BorderLayout.CENTER);
+        JButton addButton2 = new JButton("Add Book");
+        addButton2.setPreferredSize(new Dimension(120, 30));
+        addButton2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Book book = book2;
+                if (history.containsBook(book)) {
+                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+                } else {
+                    book.setRead(); // Call isRead on the book object before adding it to the history
+                    history.addBook(book);
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
+                }
+            }
+        });
+        bookPanel2.add(addButton2, BorderLayout.SOUTH);
+        bookPanel2.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // Book 3
         Book book3 = Main.randomBook(library);
@@ -138,10 +178,26 @@ public class HomePageGUI {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        bookPanel3.removeAll();
-        bookPanel3.add(bookDisplay3.rootPanel);
-        bookPanel3.revalidate();
-        bookPanel3.repaint();
+        bookPanel3.setLayout(new BorderLayout());
+        bookPanel3.add(bookDisplay3.rootPanel, BorderLayout.CENTER);
+        JButton addButton3 = new JButton("Add Book");
+        addButton3.setPreferredSize(new Dimension(120, 30));
+        addButton3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Book book = book3;
+                if (history.containsBook(book)) {
+                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+                } else {
+                    book.setRead(); // Call isRead on the book object before adding it to the history
+                    history.addBook(book);
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
+                }
+            }
+        });
+        bookPanel3.add(addButton3, BorderLayout.SOUTH);
+        bookPanel3.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // Book 4
         Book book4 = Main.randomBook(library);
@@ -151,10 +207,26 @@ public class HomePageGUI {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        bookPanel4.removeAll();
-        bookPanel4.add(bookDisplay4.rootPanel);
-        bookPanel4.revalidate();
-        bookPanel4.repaint();
+        bookPanel4.setLayout(new BorderLayout());
+        bookPanel4.add(bookDisplay4.rootPanel, BorderLayout.CENTER);
+        JButton addButton4 = new JButton("Add Book");
+        addButton4.setPreferredSize(new Dimension(120, 30));
+        addButton4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Book book = book4;
+                if (history.containsBook(book)) {
+                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+                } else {
+                    book.setRead(); // Call isRead on the book object before adding it to the history
+                    history.addBook(book);
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
+                }
+            }
+        });
+        bookPanel4.add(addButton4, BorderLayout.SOUTH);
+        bookPanel4.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // Book 5
         Book book5 = Main.randomBook(library);
@@ -164,10 +236,26 @@ public class HomePageGUI {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        bookPanel5.removeAll();
-        bookPanel5.add(bookDisplay5.rootPanel);
-        bookPanel5.revalidate();
-        bookPanel5.repaint();
+        bookPanel5.setLayout(new BorderLayout());
+        bookPanel5.add(bookDisplay5.rootPanel, BorderLayout.CENTER);
+        JButton addButton5 = new JButton("Add Book");
+        addButton5.setPreferredSize(new Dimension(120, 30));
+        addButton5.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Book book = book5;
+                if (history.containsBook(book)) {
+                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+                } else {
+                    book.setRead(); // Call isRead on the book object before adding it to the history
+                    history.addBook(book);
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
+                }
+            }
+        });
+        bookPanel5.add(addButton5, BorderLayout.SOUTH);
+        bookPanel5.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // Set the content pane and show the frame
         frame.setContentPane(contentPane);
@@ -190,6 +278,7 @@ public class HomePageGUI {
         HomePageGUI homePage = new HomePageGUI(frame);
         frame.setContentPane(homePage.getContentPane());
         frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 }

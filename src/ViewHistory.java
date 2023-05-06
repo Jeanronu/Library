@@ -18,6 +18,15 @@ public class ViewHistory {
         saveHistory();
     }
 
+    public boolean containsBook(Book book) {
+        for (Book b : historyStack) {
+            if (b.equals(book)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void clearHistory() {
         while (!historyStack.isEmpty()) {
             historyStack.pop();

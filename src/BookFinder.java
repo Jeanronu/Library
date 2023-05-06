@@ -1,10 +1,32 @@
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class BookFinder {
     private ArrayList<Book> books;
 
-    public BookFinder(ArrayList<Book> books) {
-        this.books = books;
+    public BookFinder(ArrayList<Book> allBooks) throws IOException {
+        this.books = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader("Book_data/Book1.csv"));
+        String line = reader.readLine(); // skip header row
+        while ((line = reader.readLine()) != null) {
+            String[] data = line.split(",");
+            String ISBN10 = data[1];
+            String title = data[2];
+            String subtitle = data[3];
+            String[] authors = data[4].split(";");
+            String[] categories = data[5].split(";");
+            String thumbnail = data[6];
+            String description = data[7];
+            int published = Integer.parseInt(data[8]);
+            double averageRating = Double.parseDouble(data[9]);
+            int numPages = Integer.parseInt(data[10]);
+            int numRatings = Integer.parseInt(data[11]);
+            Book book = new Book(ISBN10, title, subtitle, authors, categories, thumbnail, description, published, averageRating, numPages, numRatings);
+            this.books.add(book);
+        }
+        reader.close();
     }
 
     /**
@@ -14,7 +36,7 @@ public class BookFinder {
      */
     public ArrayList<Book> searchByTitleOrSubtitle(String keyword) {
         ArrayList<Book> results = new ArrayList<>();
-        for (Book book : books) {
+        for (Book book : this.books) {
             if (book.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
                     book.getSubtitle().toLowerCase().contains(keyword.toLowerCase())) {
                 results.add(book);
@@ -30,7 +52,7 @@ public class BookFinder {
      */
     public ArrayList<Book> searchByAuthor(String authorName) {
         ArrayList<Book> results = new ArrayList<>();
-        for (Book book : books) {
+        for (Book book : this.books) {
             for (String author : book.getAuthors()) {
                 if (author.toLowerCase().contains(authorName.toLowerCase())) {
                     results.add(book);
@@ -48,7 +70,7 @@ public class BookFinder {
      */
     public ArrayList<Book> searchByCategory(String category) {
         ArrayList<Book> results = new ArrayList<>();
-        for (Book book : books) {
+        for (Book book : this.books) {
             for (String bookCategory : book.getCategories()) {
                 if (bookCategory.toLowerCase().equals(category.toLowerCase())) {
                     results.add(book);
@@ -66,7 +88,7 @@ public class BookFinder {
      */
     public ArrayList<Book> searchByYear(int year) {
         ArrayList<Book> results = new ArrayList<>();
-        for (Book book : books) {
+        for (Book book : this.books) {
             if (book.getPublished() >= year) {
                 results.add(book);
             }
@@ -75,14 +97,13 @@ public class BookFinder {
     }
 
     public Book getBookByTitle(String title) {
-        for (Book book : books) {
+        for (Book book : this.books) {
             if (book.getTitle().equals(title)) {
                 return book;
             }
         }
         return null; // no book with matching title was found
     }
-
 
     /**
      * Finds all books with a given minimum average rating
