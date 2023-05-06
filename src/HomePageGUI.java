@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.*;
@@ -15,23 +16,34 @@ public class HomePageGUI {
         JLabel welcomeLabel = new JLabel("Welcome to the iLibrary");
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 20));
 
-        JComboBox<String> menuBox = new JComboBox<>(new String[]{"Home", "History", "Search"});
+        JComboBox<String> menuBox = new JComboBox<>(new String[]{"Home", "History", "Search", "Recommendations"});
         menuBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedOption = (String) menuBox.getSelectedItem();
                 if (selectedOption != null && selectedOption.equals("Home")) {
-                    // do nothing
+                // do nothing
                 } else if (selectedOption != null && selectedOption.equals("History")) {
                     // Open the History window
                     closeWindow(); // close the current window
                     HistoryGUI historyWindow = new HistoryGUI();
                     historyWindow.setVisible(true);
                 } else if (selectedOption != null && selectedOption.equals("Search")) {
-                    // Open the Search window
+                // Open the Search window
                     closeWindow(); // close the current window
-//                    SearchGUI searchWindow = new SearchGUI();
-//                    searchWindow.setVisible(true);
+                // SearchGUI searchWindow = new SearchGUI();
+                // searchWindow.setVisible(true);
+                } else if (selectedOption != null && selectedOption.equals("Recommendations")) {
+                    // Open the Recommendations window
+                    closeWindow(); // close the current window
+                    try {
+                        RecommendationGUI<String> recommendationWindow = new RecommendationGUI<>(new RecommendationHeap<>(new Library(new String[]{"Book_data/Book1.csv"}), history.loadHistory()), new ViewHistory("book_history.csv"));
+                        recommendationWindow.setVisible(true);
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
@@ -106,7 +118,7 @@ public class HomePageGUI {
             throw new RuntimeException(ex);
         }
 
-        // Book 1
+        // Book1
         Book book1 = Main.randomBook(library);
         BookDisplay bookDisplay1 = null;
         try {
@@ -123,18 +135,33 @@ public class HomePageGUI {
             public void actionPerformed(ActionEvent e) {
                 Book book = book1;
                 if (history.containsBook(book)) {
-                    JOptionPane.showMessageDialog(contentPane, "This book is already in the history.");
+                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
                 } else {
                     book.setRead(); // Call isRead on the book object before adding it to the history
-                    history.addBook(book);
-                    history.saveHistory(); // Save the history to the CSV file
-
-                    // Append the book to the book_history.csv file
-                    try (FileWriter writer = new FileWriter("book_history.csv", true)) {
-                        writer.write(String.format("%s,%s,%s,%d\n", book.getTitle(), book.getAuthors(), book.getCategories(), book.getISBN10()));
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                    String rating = "";
+                    int ratingValue = 0;
+                    while (true) {
+                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                        if (rating == null) {
+                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                            break;
+                        }
+                        try {
+                            ratingValue = Integer.parseInt(rating);
+                            if (ratingValue >= 1 && ratingValue <= 5) {
+                                book.setPersonalRating(ratingValue); // Set the book's rating
+                                history.addBook(book);
+                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
+                                break;
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                        }
                     }
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -219,7 +246,28 @@ public class HomePageGUI {
                     JOptionPane.showMessageDialog(frame, "This book is already in the history.");
                 } else {
                     book.setRead(); // Call isRead on the book object before adding it to the history
-                    history.addBook(book);
+                    String rating = "";
+                    int ratingValue = 0;
+                    while (true) {
+                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                        if (rating == null) {
+                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                            break;
+                        }
+                        try {
+                            ratingValue = Integer.parseInt(rating);
+                            if (ratingValue >= 1 && ratingValue <= 5) {
+                                book.setPersonalRating(ratingValue); // Set the book's rating
+                                history.addBook(book);
+                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
+                                break;
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                        }
+                    }
                     history.saveHistory(); // Save the history to the CSV file
                     HistoryGUI.historyTextArea.setText(history.getHistory());
                 }

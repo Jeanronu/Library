@@ -2,8 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class HistoryGUI extends JFrame {
     public static JTextArea historyTextArea;
@@ -27,6 +27,7 @@ public class HistoryGUI extends JFrame {
 
         // Create the view history object with the history label and filename
         historyTextArea = new JTextArea();
+        history = new ViewHistory("book_history.csv");
 
         // Load the history and display it in the text area
         history.loadHistory();
@@ -54,25 +55,6 @@ public class HistoryGUI extends JFrame {
         });
         buttonPanel.add(clearButton);
 
-        // Create a button to add a book
-        addButton = new JButton("Add Book");
-        addButton.setPreferredSize(new Dimension(120, 30));
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Book book = BookDisplay.getBook();
-                if (history.containsBook(book)) {
-                    JOptionPane.showMessageDialog(mainPanel, "This book is already in the history.");
-                } else {
-                    book.setRead(); // Call isRead on the book object before adding it to the history
-                    history.addBook(book);
-                    history.saveHistory(); // Save the history to the CSV file
-                    historyTextArea.setText(history.getHistory());
-                }
-            }
-        });
-        buttonPanel.add(addButton);
-
         // Create a scrollable text area for the history
         JScrollPane scrollPane = new JScrollPane(historyTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -80,7 +62,7 @@ public class HistoryGUI extends JFrame {
         menuPanel = new JPanel();
 
         // Create a combo box with the menu options
-        menuBox = new JComboBox<>(new String[]{"History", "Home", "Search"});
+        menuBox = new JComboBox<>(new String[]{"History", "Home", "Search", "Recommendations"});
         menuBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -95,6 +77,17 @@ public class HistoryGUI extends JFrame {
                     frame.setVisible(true);
                 } else if (selectedOption.equals("Search")) {
                     // Open the Option2 window
+                } else if (selectedOption != null && selectedOption.equals("Recommendations")) {
+                    // Open the Recommendations window
+                    dispose(); // close the current window
+                    try {
+                        RecommendationGUI<String> recommendationWindow = new RecommendationGUI<>(new RecommendationHeap<>(new Library(new String[]{"Book_data/Book1.csv"}), history.loadHistory()), new ViewHistory("book_history.csv"));
+                        recommendationWindow.setVisible(true);
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
@@ -141,8 +134,8 @@ public class HistoryGUI extends JFrame {
         setContentPane(mainPanel);
 
         // Load the history and display it in the text area
-        history.loadHistory();
-        historyTextArea.setText(history.getHistory());
+        history.userHistory();
+        historyTextArea.setText(history.userHistory());
 
         // Set the size of the window and make it visible
         setSize(600, 400);

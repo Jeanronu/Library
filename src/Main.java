@@ -11,17 +11,20 @@ public class Main {
         Library library = new Library(files);
         ArrayList<Book> bookLibrary = library.getLibrary();
         Stack<Book> readHistory = new Stack<>();
-        Book one = bookLibrary.get(1453);
-        one.setRead();
-        one.setPersonalRating(2);
-        readHistory.push(one);
-        Book two = bookLibrary.get(967);
-        two.setRead();
-        two.setPersonalRating(5);
-        readHistory.push(two);
-        Book three = bookLibrary.get(89);
-        three.setPersonalRating(3);
-        readHistory.push(three);
+        for (int i = 0; i < 23; i++) {
+            Book book = randomBook(library);
+            book.setRead();
+            book.setPersonalRating((int) (Math.random() * 5));
+            readHistory.push(book);
+            System.out.println(book);
+            System.out.println(book.getPersonalRating());
+        }
+//        RecommendationHeap<BookNode> recommendationHeap = new RecommendationHeap<>(bookLibrary, readHistory);
+//        for (int i = 0; i < 5; i++) {
+//            BookNode max = (BookNode) recommendationHeap.removeMax();
+//            Book book = max.getBook();
+//            System.out.println(max.toString());
+//        }
     }
 
     public static Book randomBook(Library library) {

@@ -42,24 +42,28 @@ public class ViewHistory {
         return sb.toString();
     }
 
-    void loadHistory() {
+    Stack<Book> loadHistory() {
+        Stack<Book> loadedHistoryStack = new Stack<>();
         try {
-            FileReader fileReader = new FileReader(filename);
+            FileReader fileReader = new FileReader("book_history.csv");
             CSVReader csvReader = new CSVReader();
             ArrayList<String[]> lines = csvReader.read(fileReader);
-            ArrayList<Book> books = new ArrayList<>();
-            BookFinder bookFinder = new BookFinder(books);
+            BookFinder bookFinder = new BookFinder();
+            ArrayList<Book> books = bookFinder.loadBooks("Book_data/Book1.csv"); // load books from CSV file
+            bookFinder.setBooks(books); // set books list in bookFinder object
             for (String[] line : lines) {
                 Book book = bookFinder.getBookByTitle(line[0]);
                 if (book != null) {
-                    historyStack.push(book);
+                    loadedHistoryStack.push(book);
                 }
             }
             fileReader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return loadedHistoryStack;
     }
+
 
     void saveBookToHistory(Book book) {
         try {
@@ -74,7 +78,7 @@ public class ViewHistory {
     void clearBookHistory() {
         try {
             FileWriter writer = new FileWriter(filename);
-            writer.write("");
+            writer.write("Book Title");
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,5 +106,24 @@ public class ViewHistory {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String userHistory() {
+        String history = "";
+        try {
+            File file = new File(filename);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                history += line + "\n";
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return history;
     }
 }

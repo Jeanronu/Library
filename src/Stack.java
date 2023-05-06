@@ -10,8 +10,8 @@ public class Stack<T> implements Iterable<T> {
         size = 0;
     }
 
-    public void push(Book data) {
-        Node<T> newNode = new Node<T>((T) data);
+    public void push(T data) {
+        Node<T> newNode = new Node<T>(data);
         newNode.next = top;
         top = newNode;
         size++;

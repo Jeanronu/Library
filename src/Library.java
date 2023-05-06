@@ -57,20 +57,4 @@ public class Library {
     public ArrayList<Book> getLibrary() {
         return this.library;
     }
-
-    public ArrayList<String> getTitles() {
-        ArrayList<String> titles = new ArrayList<>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader("book_history.csv"));
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                titles.add(parts[0]);
-            }
-            br.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return titles;
-    }
 }
