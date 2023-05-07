@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.*;
 
@@ -159,9 +158,10 @@ public class HomePageGUI {
                         } catch (NumberFormatException ex) {
                             JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                         }
+                    }if (HistoryGUI.historyTextArea != null) {
+                        history.saveHistory(); // Save the history to the CSV file
+                        HistoryGUI.historyTextArea.setText(history.getHistory());
                     }
-                    history.saveHistory(); // Save the history to the CSV file
-                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -188,9 +188,32 @@ public class HomePageGUI {
                     JOptionPane.showMessageDialog(frame, "This book is already in the history.");
                 } else {
                     book.setRead(); // Call isRead on the book object before adding it to the history
-                    history.addBook(book);
-                    history.saveHistory(); // Save the history to the CSV file
-                    HistoryGUI.historyTextArea.setText(history.getHistory());
+                    String rating = "";
+                    int ratingValue = 0;
+                    while (true) {
+                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                        if (rating == null) {
+                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                            break;
+                        }
+                        try {
+                            ratingValue = Integer.parseInt(rating);
+                            if (ratingValue >= 1 && ratingValue <= 5) {
+                                book.setPersonalRating(ratingValue); // Set the book's rating
+                                history.addBook(book);
+                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
+                                break;
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                        }
+                    }
+                    if (HistoryGUI.historyTextArea != null) {
+                        history.saveHistory(); // Save the history to the CSV file
+                        HistoryGUI.historyTextArea.setText(history.getHistory());
+                    }
                 }
             }
         });
@@ -217,9 +240,31 @@ public class HomePageGUI {
                     JOptionPane.showMessageDialog(frame, "This book is already in the history.");
                 } else {
                     book.setRead(); // Call isRead on the book object before adding it to the history
-                    history.addBook(book);
-                    history.saveHistory(); // Save the history to the CSV file
-                    HistoryGUI.historyTextArea.setText(history.getHistory());
+                    String rating = "";
+                    int ratingValue = 0;
+                    while (true) {
+                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                        if (rating == null) {
+                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                            break;
+                        }
+                        try {
+                            ratingValue = Integer.parseInt(rating);
+                            if (ratingValue >= 1 && ratingValue <= 5) {
+                                book.setPersonalRating(ratingValue); // Set the book's rating
+                                history.addBook(book);
+                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
+                                break;
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                        }
+                    }if (HistoryGUI.historyTextArea != null) {
+                        history.saveHistory(); // Save the history to the CSV file
+                        HistoryGUI.historyTextArea.setText(history.getHistory());
+                    }
                 }
             }
         });
@@ -267,9 +312,10 @@ public class HomePageGUI {
                         } catch (NumberFormatException ex) {
                             JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                         }
+                    }if (HistoryGUI.historyTextArea != null) {
+                        history.saveHistory(); // Save the history to the CSV file
+                        HistoryGUI.historyTextArea.setText(history.getHistory());
                     }
-                    history.saveHistory(); // Save the history to the CSV file
-                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -296,9 +342,31 @@ public class HomePageGUI {
                     JOptionPane.showMessageDialog(frame, "This book is already in the history.");
                 } else {
                     book.setRead(); // Call isRead on the book object before adding it to the history
-                    history.addBook(book);
-                    history.saveHistory(); // Save the history to the CSV file
-                    HistoryGUI.historyTextArea.setText(history.getHistory());
+                    String rating = "";
+                    int ratingValue = 0;
+                    while (true) {
+                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                        if (rating == null) {
+                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                            break;
+                        }
+                        try {
+                            ratingValue = Integer.parseInt(rating);
+                            if (ratingValue >= 1 && ratingValue <= 5) {
+                                book.setPersonalRating(ratingValue); // Set the book's rating
+                                history.addBook(book);
+                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
+                                break;
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
+                        }
+                    }if (HistoryGUI.historyTextArea != null) {
+                        history.saveHistory(); // Save the history to the CSV file
+                        HistoryGUI.historyTextArea.setText(history.getHistory());
+                    }
                 }
             }
         });

@@ -133,10 +133,4 @@ public class RecommendationHeap<T> extends ArrayHeap {
         return books;
     }
 
-    public void setHistoryStack(Stack<Book> readHistory) throws FileNotFoundException, IllegalArgumentException {
-        ArrayList<Book> readBooks = getHistory(readHistory);
-        calculatePotentialRatings(readBooks);
-        loadValues();
-    }
-
 }
