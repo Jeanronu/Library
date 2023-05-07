@@ -1,16 +1,28 @@
+/**
+ * This class represents a view history for a collection of books.
+ * It keeps track of the books that have been viewed and provides methods to add, clear, and retrieve book history.
+ */
 import java.io.*;
 import java.util.*;
 
 public class ViewHistory {
-    private String filename = "book_history.csv";
-    private Stack<Book> historyStack;
+    private final String filename;
+    private final Stack<Book> historyStack;
 
+    /**
+     * Constructs a ViewHistory object with the specified filename.
+     * @param filename the name of the file to store the book history
+     */
     public ViewHistory(String filename) {
         this.filename = filename;
         historyStack = new Stack<>();
         loadHistory();
     }
 
+    /**
+     * Adds a book to the history stack and saves it to the book history file.
+     * @param book the book to add to the history
+     */
     public void addBook(Book book) {
         historyStack.push(book);
         book.setRead();
@@ -18,6 +30,11 @@ public class ViewHistory {
         saveHistory();
     }
 
+    /**
+     * Checks if the history stack contains the specified book.
+     * @param book the book to check for in the history
+     * @return true if the history contains the book, false otherwise
+     */
     public boolean containsBook(Book book) {
         for (Book b : historyStack) {
             if (b.equals(book)) {
@@ -27,6 +44,9 @@ public class ViewHistory {
         return false;
     }
 
+    /**
+     * Clears the history stack and the book history file.
+     */
     public void clearHistory() {
         while (!historyStack.isEmpty()) {
             historyStack.pop();
@@ -34,6 +54,10 @@ public class ViewHistory {
         clearBookHistory();
     }
 
+    /**
+     * Gets the history of the books as a string.
+     * @return a string representation of the book history
+     */
     public String getHistory() {
         StringBuilder sb = new StringBuilder();
         for (Book book : historyStack) {
@@ -42,6 +66,10 @@ public class ViewHistory {
         return sb.toString();
     }
 
+    /**
+     * Loads the book history from the file and returns it as a stack.
+     * @return a stack of Book objects representing the book history
+     */
     Stack<Book> loadHistory() {
         Stack<Book> loadedHistoryStack = new Stack<>();
         try {
@@ -65,6 +93,10 @@ public class ViewHistory {
     }
 
 
+    /**
+     * Saves a book to the book history file.
+     * @param book the book to save to the history file
+     */
     void saveBookToHistory(Book book) {
         try {
             FileWriter writer = new FileWriter(filename, true);
@@ -75,6 +107,9 @@ public class ViewHistory {
         }
     }
 
+    /**
+     * Clears the book history file.
+     */
     void clearBookHistory() {
         try {
             FileWriter writer = new FileWriter(filename);
@@ -85,6 +120,11 @@ public class ViewHistory {
         }
     }
 
+    /**
+     This method saves the history of viewed books to a CSV file.
+     It retrieves the titles of previously viewed books from the file, and writes any new titles to the end of the file.
+     @throws IOException if an I/O error occurs while writing to or reading from the file.
+     */
     void saveHistory() {
         try {
             List<String> titles = new ArrayList<>();
@@ -108,8 +148,13 @@ public class ViewHistory {
         }
     }
 
+    /**
+     This method retrieves the history of viewed books and returns it as a String.
+     @return a String representation of the history of viewed books.
+     @throws IOException if an I/O error occurs while reading from the file.
+     */
     public String userHistory() {
-        String history = "";
+        StringBuilder history = new StringBuilder();
         try {
             File file = new File(filename);
             if (!file.exists()) {
@@ -118,12 +163,12 @@ public class ViewHistory {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
             while ((line = br.readLine()) != null) {
-                history += line + "\n";
+                history.append(line).append("\n");
             }
             br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return history;
+        return history.toString();
     }
 }

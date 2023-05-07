@@ -139,17 +139,26 @@ public class Book {
     }
 
     /**
-     * Allows two books to be compared using the first author given
+     * Allows two books to be compared using the last name of the first author given
      * @param other The book to compare this book to
      * @return This method will return a negative integer if the author of this book comes alphabetically
      * before the author of the other book, 0 if they are the same, and a positive integer if the author
      * of this book comes alphabetically later than the author of the other book.
      */
     public int compareToAuthors(Book other) {
-        String firstAuthor = authors[0]; //Uses the first author given, which is the first alphabetically
+        String firstAuthorFull = authors[0].toLowerCase(); //Uses the first author given, which is the first alphabetically
         String[] otherAuthors = other.getAuthors();
-        String otherAuthor = otherAuthors[0];
-        return firstAuthor.compareTo(otherAuthor);
+        String otherAuthorFull = otherAuthors[0].toLowerCase(); //Use lower case to make comparisons work better
+        String[] firstAuthorNames = firstAuthorFull.split(" ");
+        String firstAuthorLast = firstAuthorNames[firstAuthorNames.length - 1]; //Get the last name of the first author
+        String[] otherAuthorNames = otherAuthorFull.split(" ");
+        String otherAuthorLast = otherAuthorNames[otherAuthorNames.length - 1]; //Get the last name of the other author
+        if (firstAuthorLast.compareTo(otherAuthorLast) == 0) {
+            String firstAuthorFirst = firstAuthorNames[0];
+            String otherAuthorFirst = otherAuthorNames[0];
+            return firstAuthorFirst.compareTo(otherAuthorFirst);
+        }
+        return firstAuthorLast.compareTo(otherAuthorLast);
     }
 
     /**
@@ -170,7 +179,7 @@ public class Book {
      * of this book comes alphabetically later than the title of the other book.
      */
     public int compareToTitle(Book other) {
-        return title.compareTo(other.getTitle());
+        return title.toLowerCase().compareTo(other.getTitle().toLowerCase());
     }
 
     /**
@@ -181,9 +190,9 @@ public class Book {
      * of this book comes alphabetically later than the category of the other book.
      */
     public int compareToCategories(Book other) {
-        String category1 = this.categories[0];
+        String category1 = this.categories[0].toLowerCase();
         String[] otherCategories = other.getCategories();
-        String category2 = otherCategories[0];
+        String category2 = otherCategories[0].toLowerCase();
         return category1.compareTo(category2);
     }
 

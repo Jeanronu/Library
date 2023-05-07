@@ -11,7 +11,6 @@ public class RecommendationGUI<T> extends JFrame {
     private JComboBox<String> menuBox;
     private JTextField searchBar;
     private JButton searchButton;
-    private HomePageGUI close;
 
     public RecommendationGUI(RecommendationHeap<T> heap, ViewHistory history) throws FileNotFoundException {
         this.heap = heap;

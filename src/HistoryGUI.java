@@ -1,27 +1,37 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+/**
+ A GUI class for displaying the history of the books that the user has borrowed or returned.
+ */
 
 public class HistoryGUI extends JFrame {
     public static JTextArea historyTextArea;
     private JTextArea historyTextArea2;
-    private ViewHistory history;
+    private final ViewHistory history;
     private JButton addButton;
     private JButton clearButton;
     private JComboBox<String> menuBox;
     private JTextField searchBar;
     private JButton searchButton;
     private JPanel buttonPanel;
-    private JPanel topPanel;
     private JPanel menuPanel;
     private JLabel protitle;
     private JLabel histotitle;
     private JPanel mainPanel;
     private JPanel TopPanel;
 
+    /**
+     * Constructs a new HistoryGUI object with the title "Book History".
+     * Initializes the view history object with the history label and filename.
+     * Loads the history and displays it in the text area.
+     * Creates the title label, a panel for the buttons, a scrollable text area for the history,
+     * a panel for the menu and search components, and a title for the history panel.
+     * Sets the main panel as the content pane and sets the size of the window to 600x400.
+     */
     public HistoryGUI() {
         super("Book History");
 
@@ -48,6 +58,10 @@ public class HistoryGUI extends JFrame {
         clearButton = new JButton("Clear History");
         clearButton.setPreferredSize(new Dimension(120, 30));
         clearButton.addActionListener(new ActionListener() {
+            /**
+             * Clears the history and updates the text area.
+             * @param e The action event.
+             */
             public void actionPerformed(ActionEvent e) {
                 history.clearHistory();
                 historyTextArea.setText(history.getHistory());
@@ -64,9 +78,17 @@ public class HistoryGUI extends JFrame {
         // Create a combo box with the menu options
         menuBox = new JComboBox<>(new String[]{"History", "Home", "Search", "Recommendations"});
         menuBox.addActionListener(new ActionListener() {
+            /**
+             * Handles the action event of selecting an option from the menu.
+             * If the "Home" option is selected, redirects to the homepage.
+             * If the "Search" option is selected, opens the search window.
+             * If the "Recommendations" option is selected, opens the recommendations window.
+             * @param e The action event.
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedOption = (String) menuBox.getSelectedItem();
+                assert selectedOption != null;
                 if (selectedOption.equals("Home")) {
                     // Redirect to the homepage
                     dispose(); // Close the current window
@@ -106,12 +128,8 @@ public class HistoryGUI extends JFrame {
         menuPanel.add(searchBar);
         // Create a button for searching
         searchButton = new JButton("Search");
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String searchQuery = searchBar.getText();
-                // Implement search functionality
-            }
+        searchButton.addActionListener(e -> {
+            // Implement search functionality
         });
         menuPanel.add(searchButton);
 
@@ -120,7 +138,7 @@ public class HistoryGUI extends JFrame {
         histotitle.setFont(new Font("Arial", Font.BOLD, 20));
 
         // Create a panel for the top components
-        topPanel = new JPanel(new BorderLayout());
+        JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(protitle, BorderLayout.NORTH);
         topPanel.add(menuPanel, BorderLayout.CENTER);
 

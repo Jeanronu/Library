@@ -4,10 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.*;
 
+/**
+ * @author Jean Rojas
+ * Create a GUI for the HomePage
+ */
 public class HomePageGUI {
-    private JFrame frame;
-    private JPanel contentPane;
-    private ViewHistory history;
+    private final JFrame frame;
+    private final JPanel contentPane;
+    private final ViewHistory history;
 
     public HomePageGUI(JFrame frame) {
         this.frame = frame;
@@ -18,23 +22,29 @@ public class HomePageGUI {
         JComboBox<String> menuBox = new JComboBox<>(new String[]{"Home", "History", "Search", "Recommendations"});
         menuBox.addActionListener(new ActionListener() {
             @Override
+            /**
+             * This method handles the actions to be taken when a user clicks on an item in the menuBox.
+             * It checks the selected option and performs the corresponding action.
+             * @param e - the ActionEvent object that triggered the method call.
+             */
             public void actionPerformed(ActionEvent e) {
                 String selectedOption = (String) menuBox.getSelectedItem();
-                if (selectedOption != null && selectedOption.equals("Home")) {
-                // do nothing
-                } else if (selectedOption != null && selectedOption.equals("History")) {
+
+                if (selectedOption != null && selectedOption.equals("History")) {
                     // Open the History window
-                    closeWindow(); // close the current window
+                    closeWindow(); // Close the current window
                     HistoryGUI historyWindow = new HistoryGUI();
                     historyWindow.setVisible(true);
-                } else if (selectedOption != null && selectedOption.equals("Search")) {
-                // Open the Search window
-                    closeWindow(); // close the current window
-                // SearchGUI searchWindow = new SearchGUI();
-                // searchWindow.setVisible(true);
-                } else if (selectedOption != null && selectedOption.equals("Recommendations")) {
+                }
+                else if (selectedOption != null && selectedOption.equals("Search")) {
+                    // Open the Search window
+                    closeWindow(); // Close the current window
+                    // SearchGUI searchWindow = new SearchGUI();
+                    // searchWindow.setVisible(true);
+                }
+                else if (selectedOption != null && selectedOption.equals("Recommendations")) {
                     // Open the Recommendations window
-                    closeWindow(); // close the current window
+                    closeWindow(); // Close the current window
                     try {
                         RecommendationGUI<String> recommendationWindow = new RecommendationGUI<>(new RecommendationHeap<>(new Library(new String[]{"Book_data/Book1.csv"}), history.loadHistory()), new ViewHistory("book_history.csv"));
                         recommendationWindow.setVisible(true);
@@ -69,6 +79,7 @@ public class HomePageGUI {
 
         JButton searchButton = new JButton("Search");
 
+        // Create five JPanels, each with a 200 x 400 size
         JPanel bookPanel1 = new JPanel();
         bookPanel1.setPreferredSize(new Dimension(200, 400));
         bookPanel1.setBackground(Color.LIGHT_GRAY);
@@ -110,7 +121,7 @@ public class HomePageGUI {
         // Perform the book when the window is loaded
         history = new ViewHistory("book_history.csv");
         String[] files = {"Book_data/Book1.csv"};
-        Library library = null;
+        Library library;
         try {
             library = new Library(files);
         } catch (IOException ex) {
@@ -119,7 +130,7 @@ public class HomePageGUI {
 
         // Book1
         Book book1 = Main.randomBook(library);
-        BookDisplay bookDisplay1 = null;
+        BookDisplay bookDisplay1;
         try {
             bookDisplay1 = new BookDisplay(book1);
         } catch (IOException ex) {
@@ -127,41 +138,50 @@ public class HomePageGUI {
         }
         bookPanel1.setLayout(new BorderLayout());
         bookPanel1.add(bookDisplay1.rootPanel, BorderLayout.CENTER);
+
+        /**
+         * Creates 5 JButtons for adding the books to the user's history and adds it to bookPanel#.
+         * The button has a fixed preferred size of 120x30 and triggers an ActionListener
+         * that prompts the user to rate the book and add it to the history if it has not been added yet.
+         * If the user cancels the rating, the book is not added to the history.
+         * If the rating is invalid, the user is prompted to enter a number from 1-5.
+         * If the book has already been added to the history, a message is displayed and the book is not added again.
+         * The history text area is updated if it exists.
+         *
+         * @param book# the Book object to be added to the history
+         */
         JButton addButton1 = new JButton("Add Book");
         addButton1.setPreferredSize(new Dimension(120, 30));
-        addButton1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Book book = book1;
-                if (history.containsBook(book)) {
-                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
-                } else {
-                    book.setRead(); // Call isRead on the book object before adding it to the history
-                    String rating = "";
-                    int ratingValue = 0;
-                    while (true) {
-                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
-                        if (rating == null) {
-                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+        addButton1.addActionListener(e -> {
+            if (history.containsBook(book1)) {
+                JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+            } else {
+                book1.setRead(); // Call isRead on the book object before adding it to the history
+                String rating;
+                int ratingValue;
+                while (true) {
+                    rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                    if (rating == null) {
+                        JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                        break;
+                    }
+                    try {
+                        ratingValue = Integer.parseInt(rating);
+                        if (ratingValue >= 1 && ratingValue <= 5) {
+                            book1.setPersonalRating(ratingValue); // Set the book's rating
+                            history.addBook(book1);
+                            JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
                             break;
-                        }
-                        try {
-                            ratingValue = Integer.parseInt(rating);
-                            if (ratingValue >= 1 && ratingValue <= 5) {
-                                book.setPersonalRating(ratingValue); // Set the book's rating
-                                history.addBook(book);
-                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
-                                break;
-                            } else {
-                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
-                            }
-                        } catch (NumberFormatException ex) {
+                        } else {
                             JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                         }
-                    }if (HistoryGUI.historyTextArea != null) {
-                        history.saveHistory(); // Save the history to the CSV file
-                        HistoryGUI.historyTextArea.setText(history.getHistory());
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                     }
+                }
+                if (HistoryGUI.historyTextArea != null) {
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -170,7 +190,7 @@ public class HomePageGUI {
 
         // Book 2
         Book book2 = Main.randomBook(library);
-        BookDisplay bookDisplay2 = null;
+        BookDisplay bookDisplay2;
         try {
             bookDisplay2 = new BookDisplay(book2);
         } catch (IOException ex) {
@@ -180,40 +200,36 @@ public class HomePageGUI {
         bookPanel2.add(bookDisplay2.rootPanel, BorderLayout.CENTER);
         JButton addButton2 = new JButton("Add Book");
         addButton2.setPreferredSize(new Dimension(120, 30));
-        addButton2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Book book = book2;
-                if (history.containsBook(book)) {
-                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
-                } else {
-                    book.setRead(); // Call isRead on the book object before adding it to the history
-                    String rating = "";
-                    int ratingValue = 0;
-                    while (true) {
-                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
-                        if (rating == null) {
-                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+        addButton2.addActionListener(e -> {
+            if (history.containsBook(book2)) {
+                JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+            } else {
+                book2.setRead(); // Call isRead on the book object before adding it to the history
+                String rating;
+                int ratingValue;
+                while (true) {
+                    rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                    if (rating == null) {
+                        JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                        break;
+                    }
+                    try {
+                        ratingValue = Integer.parseInt(rating);
+                        if (ratingValue >= 1 && ratingValue <= 5) {
+                            book2.setPersonalRating(ratingValue); // Set the book's rating
+                            history.addBook(book2);
+                            JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
                             break;
-                        }
-                        try {
-                            ratingValue = Integer.parseInt(rating);
-                            if (ratingValue >= 1 && ratingValue <= 5) {
-                                book.setPersonalRating(ratingValue); // Set the book's rating
-                                history.addBook(book);
-                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
-                                break;
-                            } else {
-                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
-                            }
-                        } catch (NumberFormatException ex) {
+                        } else {
                             JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                         }
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                     }
-                    if (HistoryGUI.historyTextArea != null) {
-                        history.saveHistory(); // Save the history to the CSV file
-                        HistoryGUI.historyTextArea.setText(history.getHistory());
-                    }
+                }
+                if (HistoryGUI.historyTextArea != null) {
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -222,7 +238,7 @@ public class HomePageGUI {
 
         // Book 3
         Book book3 = Main.randomBook(library);
-        BookDisplay bookDisplay3 = null;
+        BookDisplay bookDisplay3;
         try {
             bookDisplay3 = new BookDisplay(book3);
         } catch (IOException ex) {
@@ -232,39 +248,35 @@ public class HomePageGUI {
         bookPanel3.add(bookDisplay3.rootPanel, BorderLayout.CENTER);
         JButton addButton3 = new JButton("Add Book");
         addButton3.setPreferredSize(new Dimension(120, 30));
-        addButton3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Book book = book3;
-                if (history.containsBook(book)) {
-                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
-                } else {
-                    book.setRead(); // Call isRead on the book object before adding it to the history
-                    String rating = "";
-                    int ratingValue = 0;
-                    while (true) {
-                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
-                        if (rating == null) {
-                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+        addButton3.addActionListener(e -> {
+            if (history.containsBook(book3)) {
+                JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+            } else {
+                book3.setRead(); // Call isRead on the book object before adding it to the history
+                String rating;
+                int ratingValue;
+                while (true) {
+                    rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                    if (rating == null) {
+                        JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                        break;
+                    }
+                    try {
+                        ratingValue = Integer.parseInt(rating);
+                        if (ratingValue >= 1 && ratingValue <= 5) {
+                            book3.setPersonalRating(ratingValue); // Set the book's rating
+                            history.addBook(book3);
+                            JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
                             break;
-                        }
-                        try {
-                            ratingValue = Integer.parseInt(rating);
-                            if (ratingValue >= 1 && ratingValue <= 5) {
-                                book.setPersonalRating(ratingValue); // Set the book's rating
-                                history.addBook(book);
-                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
-                                break;
-                            } else {
-                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
-                            }
-                        } catch (NumberFormatException ex) {
+                        } else {
                             JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                         }
-                    }if (HistoryGUI.historyTextArea != null) {
-                        history.saveHistory(); // Save the history to the CSV file
-                        HistoryGUI.historyTextArea.setText(history.getHistory());
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                     }
+                }if (HistoryGUI.historyTextArea != null) {
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -273,7 +285,7 @@ public class HomePageGUI {
 
         // Book 4
         Book book4 = Main.randomBook(library);
-        BookDisplay bookDisplay4 = null;
+        BookDisplay bookDisplay4;
         try {
             bookDisplay4 = new BookDisplay(book4);
         } catch (IOException ex) {
@@ -283,39 +295,35 @@ public class HomePageGUI {
         bookPanel4.add(bookDisplay4.rootPanel, BorderLayout.CENTER);
         JButton addButton4 = new JButton("Add Book");
         addButton4.setPreferredSize(new Dimension(120, 30));
-        addButton4.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Book book = book4;
-                if (history.containsBook(book)) {
-                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
-                } else {
-                    book.setRead(); // Call isRead on the book object before adding it to the history
-                    String rating = "";
-                    int ratingValue = 0;
-                    while (true) {
-                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
-                        if (rating == null) {
-                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+        addButton4.addActionListener(e -> {
+            if (history.containsBook(book4)) {
+                JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+            } else {
+                book4.setRead(); // Call isRead on the book object before adding it to the history
+                String rating;
+                int ratingValue;
+                while (true) {
+                    rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                    if (rating == null) {
+                        JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                        break;
+                    }
+                    try {
+                        ratingValue = Integer.parseInt(rating);
+                        if (ratingValue >= 1 && ratingValue <= 5) {
+                            book4.setPersonalRating(ratingValue); // Set the book's rating
+                            history.addBook(book4);
+                            JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
                             break;
-                        }
-                        try {
-                            ratingValue = Integer.parseInt(rating);
-                            if (ratingValue >= 1 && ratingValue <= 5) {
-                                book.setPersonalRating(ratingValue); // Set the book's rating
-                                history.addBook(book);
-                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
-                                break;
-                            } else {
-                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
-                            }
-                        } catch (NumberFormatException ex) {
+                        } else {
                             JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                         }
-                    }if (HistoryGUI.historyTextArea != null) {
-                        history.saveHistory(); // Save the history to the CSV file
-                        HistoryGUI.historyTextArea.setText(history.getHistory());
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                     }
+                }if (HistoryGUI.historyTextArea != null) {
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -324,7 +332,7 @@ public class HomePageGUI {
 
         // Book 5
         Book book5 = Main.randomBook(library);
-        BookDisplay bookDisplay5 = null;
+        BookDisplay bookDisplay5;
         try {
             bookDisplay5 = new BookDisplay(book5);
         } catch (IOException ex) {
@@ -334,39 +342,35 @@ public class HomePageGUI {
         bookPanel5.add(bookDisplay5.rootPanel, BorderLayout.CENTER);
         JButton addButton5 = new JButton("Add Book");
         addButton5.setPreferredSize(new Dimension(120, 30));
-        addButton5.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Book book = book5;
-                if (history.containsBook(book)) {
-                    JOptionPane.showMessageDialog(frame, "This book is already in the history.");
-                } else {
-                    book.setRead(); // Call isRead on the book object before adding it to the history
-                    String rating = "";
-                    int ratingValue = 0;
-                    while (true) {
-                        rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
-                        if (rating == null) {
-                            JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+        addButton5.addActionListener(e -> {
+            if (history.containsBook(book5)) {
+                JOptionPane.showMessageDialog(frame, "This book is already in the history.");
+            } else {
+                book5.setRead(); // Call isRead on the book object before adding it to the history
+                String rating;
+                int ratingValue;
+                while (true) {
+                    rating = JOptionPane.showInputDialog(frame, "Please rate the book from 1-5:");
+                    if (rating == null) {
+                        JOptionPane.showMessageDialog(frame, "Sorry but for you to add the book to your list, you have to rate it. Thank you <3");
+                        break;
+                    }
+                    try {
+                        ratingValue = Integer.parseInt(rating);
+                        if (ratingValue >= 1 && ratingValue <= 5) {
+                            book5.setPersonalRating(ratingValue); // Set the book's rating
+                            history.addBook(book5);
+                            JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
                             break;
-                        }
-                        try {
-                            ratingValue = Integer.parseInt(rating);
-                            if (ratingValue >= 1 && ratingValue <= 5) {
-                                book.setPersonalRating(ratingValue); // Set the book's rating
-                                history.addBook(book);
-                                JOptionPane.showMessageDialog(frame, "Your book have been added. <3");
-                                break;
-                            } else {
-                                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
-                            }
-                        } catch (NumberFormatException ex) {
+                        } else {
                             JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                         }
-                    }if (HistoryGUI.historyTextArea != null) {
-                        history.saveHistory(); // Save the history to the CSV file
-                        HistoryGUI.historyTextArea.setText(history.getHistory());
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number from 1-5.");
                     }
+                }if (HistoryGUI.historyTextArea != null) {
+                    history.saveHistory(); // Save the history to the CSV file
+                    HistoryGUI.historyTextArea.setText(history.getHistory());
                 }
             }
         });
@@ -379,12 +383,19 @@ public class HomePageGUI {
         frame.setVisible(true);
     }
 
+    /**
+     Closes the current window.
+     If the frame is not null, it is disposed of.
+     */
     public void closeWindow() {
         if (this.frame != null) {
             this.frame.dispose();
         }
     }
-
+    /**
+     Returns the content pane of the window.
+     @return the content pane of the window
+     */
     public JPanel getContentPane() {
         return contentPane;
     }

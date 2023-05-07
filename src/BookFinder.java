@@ -3,22 +3,40 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * The BookFinder class is responsible for loading a list of books from a file and providing methods for searching the books based on various criteria.
+ * @author Jean Rojas
+ */
 public class BookFinder {
     private ArrayList<Book> books;
 
+    /**
+     * Creates a new instance of the BookFinder class.
+     */
     public BookFinder() {
         this.books = new ArrayList<>();
     }
 
+    /**
+     * Sets the list of books.
+     * @param books The ArrayList of Book objects to set.
+     */
     public void setBooks(ArrayList<Book> books) {
         this.books = books;
     }
 
+    /**
+     * Loads a list of books from a CSV file.
+     * @param filePath The path to the CSV file to load.
+     * @return An ArrayList of Book objects loaded from the file.
+     * @throws IOException If an I/O error occurs while reading the file.
+     */
     public ArrayList<Book> loadBooks(String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line = reader.readLine(); // skip header row
         while ((line = reader.readLine()) != null) {
-            String[] data = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");        String ISBN10 = data[1];
+            String[] data = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            String ISBN10 = data[1];
             String title = data[2];
             String subtitle = data[3];
             String[] authors = data[4].split(";");
@@ -49,72 +67,10 @@ public class BookFinder {
     }
 
     /**
-     * Finds all books containing a given keyword in their title or subtitle
-     * @param keyword the keyword to search for
-     * @return an ArrayList of books containing the keyword in their title or subtitle
+     * Returns the first book found in the list with a matching title.
+     * @param title The title of the book to search for.
+     * @return The first Book object found in the list with a matching title, or null if no match is found.
      */
-    public ArrayList<Book> searchByTitleOrSubtitle(String keyword) {
-        ArrayList<Book> results = new ArrayList<>();
-        for (Book book : this.books) {
-            if (book.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
-                    book.getSubtitle().toLowerCase().contains(keyword.toLowerCase())) {
-                results.add(book);
-            }
-        }
-        return results;
-    }
-
-    /**
-     * Finds all books containing a given author name
-     * @param authorName the author name to search for
-     * @return an ArrayList of books containing the author name
-     */
-    public ArrayList<Book> searchByAuthor(String authorName) {
-        ArrayList<Book> results = new ArrayList<>();
-        for (Book book : this.books) {
-            for (String author : book.getAuthors()) {
-                if (author.toLowerCase().contains(authorName.toLowerCase())) {
-                    results.add(book);
-                    break;
-                }
-            }
-        }
-        return results;
-    }
-
-    /**
-     * Finds all books in a given category
-     * @param category the category to search for
-     * @return an ArrayList of books in the category
-     */
-    public ArrayList<Book> searchByCategory(String category) {
-        ArrayList<Book> results = new ArrayList<>();
-        for (Book book : this.books) {
-            for (String bookCategory : book.getCategories()) {
-                if (bookCategory.toLowerCase().equals(category.toLowerCase())) {
-                    results.add(book);
-                    break;
-                }
-            }
-        }
-        return results;
-    }
-
-    /**
-     * Finds all books published in a given year or later
-     * @param year the year to search for
-     * @return an ArrayList of books published in the year or later
-     */
-    public ArrayList<Book> searchByYear(int year) {
-        ArrayList<Book> results = new ArrayList<>();
-        for (Book book : this.books) {
-            if (book.getPublished() >= year) {
-                results.add(book);
-            }
-        }
-        return results;
-    }
-
     public Book getBookByTitle(String title) {
         for (Book book : this.books) {
             if (book.getTitle().equals(title)) {
@@ -122,20 +78,5 @@ public class BookFinder {
             }
         }
         return null; // no book with matching title was found
-    }
-
-    /**
-     * Finds all books with a given minimum average rating
-     * @param rating the minimum average rating to search for
-     * @return an ArrayList of books with the minimum average rating or higher
-     */
-    public ArrayList<Book> searchByRating(double rating) {
-        ArrayList<Book> results = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getAverageRating() >= rating) {
-                results.add(book);
-            }
-        }
-        return results;
     }
 }
