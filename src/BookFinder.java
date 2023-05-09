@@ -33,35 +33,9 @@ public class BookFinder {
      */
     public ArrayList<Book> loadBooks(String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
-        String line = reader.readLine(); // skip header row
-        while ((line = reader.readLine()) != null) {
-            String[] data = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-            String ISBN10 = data[1];
-            String title = data[2];
-            String subtitle = data[3];
-            String[] authors = data[4].split(";");
-            String[] categories = data[5].split(";");
-            String thumbnail = data[6];
-            String description = data[7];
-            int published = 0;
-            if (data.length > 8 && !data[8].equals("")) {
-                published = Integer.parseInt(data[8]);
-            }
-            double averageRating = 0.0;
-            if (data.length > 9 && !data[9].equals("")) {
-                averageRating = Double.parseDouble(data[9]);
-            }
-            int numPages = 0;
-            if (data.length > 10) {
-                numPages = Integer.parseInt(data[10]);
-            }
-            int numRatings = 0;
-            if (data.length > 11) {
-                numRatings = Integer.parseInt(data[11]);
-            }
-            Book book = new Book(ISBN10, title, subtitle, authors, categories, thumbnail, description, published, averageRating, numPages, numRatings);
-            this.books.add(book);
-        }
+        String[] files = {filePath};
+        Library library = new Library(files);
+        this.books = library.getLibrary();
         reader.close();
         return this.books;
     }
