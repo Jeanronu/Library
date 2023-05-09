@@ -1,10 +1,14 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
+ * @author Jean Rojas
  A GUI class for displaying the history of the books that the user has borrowed or returned.
  */
 
@@ -23,6 +27,8 @@ public class HistoryGUI extends JFrame {
     private JLabel histotitle;
     private JPanel mainPanel;
     private JPanel TopPanel;
+    private JLabel messageLabel;
+    private JPanel bookPanelContainer;
 
     /**
      * Constructs a new HistoryGUI object with the title "Book History".
@@ -45,6 +51,7 @@ public class HistoryGUI extends JFrame {
         historyTextArea.setEditable(false);
         historyTextArea.setBackground(Color.WHITE);
         historyTextArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        historyTextArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Create the title label
         protitle = new JLabel("Book History");
@@ -89,26 +96,33 @@ public class HistoryGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String selectedOption = (String) menuBox.getSelectedItem();
                 assert selectedOption != null;
-                if (selectedOption.equals("Home")) {
-                    // Redirect to the homepage
-                    dispose(); // Close the current window
-                    JFrame frame = new JFrame("iLibrary");
-                    HomePageGUI homePage = new HomePageGUI(frame);
-                    frame.setContentPane(homePage.getContentPane());
-                    frame.pack();
-                    frame.setVisible(true);
-                } else if (selectedOption.equals("Search")) {
-                    // Open the Option2 window
-                } else if (selectedOption != null && selectedOption.equals("Recommendations")) {
-                    // Open the Recommendations window
-                    dispose(); // close the current window
-                    try {
-                        RecommendationGUI<String> recommendationWindow = new RecommendationGUI<>(new RecommendationHeap<>(new Library(new String[]{"Book_data/Book1.csv"}), history.loadHistory()), new ViewHistory("book_history.csv"));
-                        recommendationWindow.setVisible(true);
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                switch (selectedOption) {
+                    case "Home" -> {
+                        // Redirect to the homepage
+                        dispose(); // Close the current window
+                        JFrame frame = new JFrame("iLibrary");
+                        HomePageGUI homePage = new HomePageGUI(frame);
+                        frame.setContentPane(homePage.getContentPane());
+                        frame.pack();
+                        frame.setVisible(true);
+                    }
+                    case "Search" -> {
+                        // Open the Search window
+                        dispose(); // close the current window
+                        SearchGUI searchgui = new SearchGUI();
+                        searchgui.setVisible(true);
+                    }
+                    case "Recommendations" -> {
+                        // Open the Recommendations window
+                        dispose(); // close the current window
+                        try {
+                            RecommendationGUI<String> recommendationWindow = new RecommendationGUI<>(new RecommendationHeap<>(new Library(new String[]{"Book_data/Book1.csv"}), history.loadHistory()), new ViewHistory("book_history.csv"));
+                            recommendationWindow.setVisible(true);
+                        } catch (FileNotFoundException ex) {
+                            ex.printStackTrace();
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
@@ -117,20 +131,91 @@ public class HistoryGUI extends JFrame {
         menuPanel.add(menuBox);
 
         // Create a text field for searching
-        searchBar = new JTextField(20);
-        searchBar.addFocusListener(new FocusAdapter() {
+        searchBar = new JTextField("Search", 20);
+        searchBar.setForeground(Color.GRAY);
+        searchBar.addFocusListener(new FocusListener() {
             @Override
-            // When the text field gains focus, the focusGained method is called, which sets the text of the text field to an empty string. This allows the user to start typing immediately without deleting any existing text in the field.
             public void focusGained(FocusEvent e) {
-                searchBar.setText("");
+                if (searchBar.getText().equals("Search")) {
+                    searchBar.setText("");
+                    searchBar.setForeground(Color.BLACK);
+                }
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchBar.getText().isEmpty()) {
+                    searchBar.setForeground(Color.GRAY);
+                    searchBar.setText("Search");
+                }
             }
         });
-        menuPanel.add(searchBar);
-        // Create a button for searching
+
         searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> {
-            // Implement search functionality
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String searchText = searchBar.getText();
+                String category = null;
+                // Show a dialog to select the category
+                String[] options = new String[] {"Category", "Author", "Title"};
+                JComboBox<String> categoryBox = new JComboBox<>(options);
+                int option = JOptionPane.showOptionDialog(mainPanel, categoryBox, "Select a Category", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+                if (option == JOptionPane.OK_OPTION) {
+                    category = (String) categoryBox.getSelectedItem();
+                }
+
+                String[] files = {"Book_data/Book1.csv"};
+                Library bookLibrary = null;
+                try {
+                    bookLibrary = new Library(files);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                ArrayList<Book> library = bookLibrary.getLibrary(); // contains all the books from the Book csv file
+                LinkedBinarySearchTreeBook<ArrayList<Book>> booksOrganized = OrganizeBooks.organizeTitle(library); // tree of library books sorted by title
+                LinkedBinarySearchTreeBook<ArrayList<Book>> autOrganized = OrganizeBooks.organizeAuthor(library); // tree of library books sorted by author
+                LinkedBinarySearchTreeBook<ArrayList<Book>> catOrganized = OrganizeBooks.organizeCategories(library); // tree of library books sorted by category
+                ArrayList<Book> results = null;
+                ArrayList<LinkedBinarySearchTreeBook<ArrayList<Book>>> treeList = new ArrayList<>();
+                treeList.add(booksOrganized);
+                treeList.add(autOrganized);
+                treeList.add(catOrganized);
+
+                switch(category) {
+                    case "Category":
+                        results = SearchBooks.categorySearch(searchText, library, catOrganized);
+                        break;
+                    case "Title":
+                        results = SearchBooks.titleSearch(searchText, library, booksOrganized);
+                        break;
+                    case "Author":
+                        results = SearchBooks.authorSearch(searchText, library, autOrganized);
+                        break;
+                }
+
+                // Remove existing book panels
+                bookPanelContainer.removeAll();
+                if (results == null || results.isEmpty()) {
+                    messageLabel.setText("No results found.");
+                    bookPanelContainer.removeAll(); // clear any existing book panels
+                    JOptionPane.showMessageDialog(mainPanel, "Book not found", "Search Results", JOptionPane.INFORMATION_MESSAGE); // show message dialog
+                } else {
+                    messageLabel.setText("Showing " + results.size() + " results.");
+                    displayBooksTable(results);
+                }
+
+                // Update the book panel container
+                bookPanelContainer.revalidate();
+                bookPanelContainer.repaint();
+            }
         });
+
+        messageLabel = new JLabel();
+        bookPanelContainer = new JPanel();
+        bookPanelContainer.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        menuPanel.add(searchBar);
         menuPanel.add(searchButton);
 
         // Create a title for the history panel
@@ -156,9 +241,46 @@ public class HistoryGUI extends JFrame {
         historyTextArea.setText(history.userHistory());
 
         // Set the size of the window and make it visible
-        setSize(600, 400);
-        setLocationRelativeTo(null);
+        setSize(1050, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }
+
+    /**
+     * Displays the list of books in a table format using a JOptionPane.
+     * @param books the list of books to be displayed in the table
+     */
+    public void displayBooksTable(ArrayList<Book> books) {
+        // Create the data array and column names for the table
+        Object[][] data = new Object[books.size()][3];
+        String[] columnNames = {"Title", "Author", "Category"};
+
+        // Populate the data array with the book information
+        for (int i = 0; i < books.size(); i++) {
+            Book book = books.get(i);
+            data[i][0] = book.getTitle();
+            data[i][1] = String.join(", ", book.getAuthors());
+            data[i][2] = String.join(", ", book.getCategories());
+        }
+
+        // Create the JTable using the data array and column names
+        JTable table = new JTable(data, columnNames);
+
+        // Set the row height and auto resize mode for the table
+        table.setRowHeight(25);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+
+        // Set the alignment of the cell renderer to center
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.setDefaultRenderer(Object.class, centerRenderer);
+
+        // Create a scroll pane for the table and set its dimensions
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(600, 400));
+
+        // Display the table in a JOptionPane with a plain message type
+        JOptionPane.showMessageDialog(mainPanel, scrollPane, "Search Results", JOptionPane.PLAIN_MESSAGE);
+    }
+
 }

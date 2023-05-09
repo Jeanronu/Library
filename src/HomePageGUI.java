@@ -2,22 +2,31 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  * @author Jean Rojas
- * Create a GUI for the HomePage
+ * Create a GUI for the HomePage, where it displays books
  */
 public class HomePageGUI {
     private final JFrame frame;
     private final JPanel contentPane;
     private final ViewHistory history;
+    private final JTextField searchField;
+    private final JLabel messageLabel;
+    private final JPanel bookPanelContainer;
+
 
     public HomePageGUI(JFrame frame) {
         this.frame = frame;
         // Create the components
         JLabel welcomeLabel = new JLabel("Welcome to the iLibrary");
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 20));
+        welcomeLabel.setHorizontalAlignment(JLabel.CENTER);
 
         JComboBox<String> menuBox = new JComboBox<>(new String[]{"Home", "History", "Search", "Recommendations"});
         menuBox.addActionListener(new ActionListener() {
@@ -38,9 +47,9 @@ public class HomePageGUI {
                 }
                 else if (selectedOption != null && selectedOption.equals("Search")) {
                     // Open the Search window
-                    closeWindow(); // Close the current window
-                    // SearchGUI searchWindow = new SearchGUI();
-                    // searchWindow.setVisible(true);
+                    closeWindow(); // close the current window
+                    SearchGUI searchgui = new SearchGUI();
+                    searchgui.setVisible(true);
                 }
                 else if (selectedOption != null && selectedOption.equals("Recommendations")) {
                     // Open the Recommendations window
@@ -57,7 +66,7 @@ public class HomePageGUI {
             }
         });
 
-        JTextField searchField = new JTextField("Search", 20);
+        searchField = new JTextField("Search", 20);
         searchField.setForeground(Color.GRAY);
         searchField.addFocusListener(new FocusListener() {
             @Override
@@ -67,7 +76,6 @@ public class HomePageGUI {
                     searchField.setForeground(Color.BLACK);
                 }
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 if (searchField.getText().isEmpty()) {
@@ -78,6 +86,63 @@ public class HomePageGUI {
         });
 
         JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String searchText = searchField.getText();
+                String category = null;
+                // Show a dialog to select the category
+                String[] options = new String[] {"Category", "Author", "Title"};
+                JComboBox<String> categoryBox = new JComboBox<>(options);
+                int option = JOptionPane.showOptionDialog(frame, categoryBox, "Select a Category", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+                if (option == JOptionPane.OK_OPTION) {
+                    category = (String) categoryBox.getSelectedItem();
+                }
+
+                String[] files = {"Book_data/Book1.csv"};
+                Library bookLibrary = null;
+                try {
+                    bookLibrary = new Library(files);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                ArrayList<Book> library = bookLibrary.getLibrary(); // contains all the books from the Book csv file
+                LinkedBinarySearchTreeBook<ArrayList<Book>> booksOrganized = OrganizeBooks.organizeTitle(library); // tree of library books sorted by title
+                LinkedBinarySearchTreeBook<ArrayList<Book>> autOrganized = OrganizeBooks.organizeAuthor(library); // tree of library books sorted by author
+                LinkedBinarySearchTreeBook<ArrayList<Book>> catOrganized = OrganizeBooks.organizeCategories(library); // tree of library books sorted by category
+                ArrayList<Book> results = null;
+                ArrayList<LinkedBinarySearchTreeBook<ArrayList<Book>>> treeList = new ArrayList<>();
+                treeList.add(booksOrganized);
+                treeList.add(autOrganized);
+                treeList.add(catOrganized);
+
+                switch (Objects.requireNonNull(category)) {
+                    case "Category" -> results = SearchBooks.categorySearch(searchText, library, catOrganized);
+                    case "Title" -> results = SearchBooks.titleSearch(searchText, library, booksOrganized);
+                    case "Author" -> results = SearchBooks.authorSearch(searchText, library, autOrganized);
+                }
+
+                // Remove existing book panels
+                bookPanelContainer.removeAll();
+                if (results == null || results.isEmpty()) {
+                    messageLabel.setText("No results found.");
+                    bookPanelContainer.removeAll(); // clear any existing book panels
+                    JOptionPane.showMessageDialog(frame, "Book not found", "Search Results", JOptionPane.INFORMATION_MESSAGE); // show message dialog
+                } else {
+                    messageLabel.setText("Showing " + results.size() + " results.");
+                    displayBooksTable(results);
+                }
+
+                // Update the book panel container
+                bookPanelContainer.revalidate();
+                bookPanelContainer.repaint();
+            }
+        });
+
+        messageLabel = new JLabel();
+        bookPanelContainer = new JPanel();
+        bookPanelContainer.setLayout(new BorderLayout());
 
         // Create five JPanels, each with a 200 x 400 size
         JPanel bookPanel1 = new JPanel();
@@ -381,6 +446,39 @@ public class HomePageGUI {
         frame.setContentPane(contentPane);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    /**
+     * Displays the list of books in a table format using a JOptionPane.
+     *
+     * @param books the list of books to be displayed in the table
+     */
+    public void displayBooksTable(ArrayList<Book> books) {
+        // Create the data array and column names for the table
+        Object[][] data = new Object[books.size()][3];
+        String[] columnNames = {"Title", "Author", "Category"};
+
+        // Populate the data array with the book information
+        for (int i = 0; i < books.size(); i++) {
+            Book book = books.get(i);
+            data[i][0] = book.getTitle();
+            data[i][1] = String.join(", ", book.getAuthors());
+            data[i][2] = String.join(", ", book.getCategories());
+        }
+
+        // Create the JTable using the data array and column names
+        JTable table = new JTable(data, columnNames);
+
+        // Set the row height and auto resize mode for the table
+        table.setRowHeight(25);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+
+        // Create a scroll pane for the table and set its dimensions
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(600, 400));
+
+        // Display the table in a JOptionPane with a plain message type
+        JOptionPane.showMessageDialog(frame, scrollPane, "Search Results", JOptionPane.PLAIN_MESSAGE);
     }
 
     /**

@@ -1,4 +1,6 @@
+import javax.swing.*;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -25,11 +27,17 @@ public class RecommendationHeap<T> extends ArrayHeap {
      * @throws FileNotFoundException The method creates BookVectors, which have the potential to throw FileNotFoundExceptions
      * @throws IllegalArgumentException Creates matrices, which have the potential to throw IllegalArgumentExceptions
      */
-    public RecommendationHeap(Library library, Stack<Book> viewHistory) throws FileNotFoundException, IllegalArgumentException {
+    public RecommendationHeap(Library library, Stack<Book> viewHistory) throws IOException, IllegalArgumentException {
         super();
         this.library = library.getLibrary(); // get the ArrayList from the Library object
         if (viewHistory.isEmpty()) {
-            throw new IllegalArgumentException("The view history is empty.");
+            JOptionPane.showMessageDialog(null, "You have not read any book so far so we cannot recommend any books. For us can recommend books to you, you have to read at least 23 books <3");
+            JFrame frame = new JFrame("iLibrary");
+            HomePageGUI homePage = new HomePageGUI(frame);
+            frame.setContentPane(homePage.getContentPane());
+            frame.pack();
+            frame.setVisible(true);
+            return;
         }
         ArrayList<Book> readBooks = getHistory(viewHistory);
         calculatePotentialRatings(readBooks);
@@ -66,10 +74,18 @@ public class RecommendationHeap<T> extends ArrayHeap {
      * @throws IllegalArgumentException If the matrix is not invertible, the program will not work. Or, if the user has not
      *                                  marked enough books as read before calling
      */
-    public void calculatePotentialRatings(ArrayList<Book> readBooks) throws FileNotFoundException, IllegalArgumentException {
+    public void calculatePotentialRatings(ArrayList<Book> readBooks) throws IOException, IllegalArgumentException {
         int size = readBooks.size();
         if (size < 22) {
-            throw new IllegalArgumentException("Please rate more books before using this method!");
+            int numToAdd = 22 - size;
+            System.out.println("Please rate more books before using this method! Adding " + numToAdd + " random books.");
+            Library library = new Library(new String[]{"Book_data/Book1.csv"});
+            for (int i = 0; i < numToAdd; i++) {
+                Book book = Main.randomBook(library);
+                book.setRead();
+                book.setPersonalRating((int) (Math.random() * 5));
+                readBooks.add(book);
+            }
         }
         Vector ratings = new Vector(size); //Create a Vector to hold the user's ratings of the book
         //This matrix will technically be the transpose of the matrix that is designated A,

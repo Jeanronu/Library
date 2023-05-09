@@ -61,7 +61,8 @@ public class ViewHistory {
     public String getHistory() {
         StringBuilder sb = new StringBuilder();
         for (Book book : historyStack) {
-            sb.append(book.getTitle()).append("\n");
+            sb.append(book.getTitle());
+            sb.append(",").append(book.getPersonalRating()).append("\n");
         }
         return sb.toString();
     }
@@ -82,6 +83,8 @@ public class ViewHistory {
             for (String[] line : lines) {
                 Book book = bookFinder.getBookByTitle(line[0]);
                 if (book != null) {
+                    book.setPersonalRating(Integer.parseInt(line[1]));
+                    book.setRead();
                     loadedHistoryStack.push(book);
                 }
             }
@@ -100,7 +103,7 @@ public class ViewHistory {
     void saveBookToHistory(Book book) {
         try {
             FileWriter writer = new FileWriter(filename, true);
-            writer.write(book.getTitle() + "\n");
+            writer.write(book.getTitle() +  "," + book.getPersonalRating() + "\n");
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,7 +116,7 @@ public class ViewHistory {
     void clearBookHistory() {
         try {
             FileWriter writer = new FileWriter(filename);
-            writer.write("Book Title");
+            writer.write("Book Title,Rating\n");
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,6 +135,7 @@ public class ViewHistory {
             CSVReader csvReader = new CSVReader();
             ArrayList<String[]> lines = csvReader.read(fileReader);
             for (String[] line : lines) {
+                ArrayList<String> info = new ArrayList<>();
                 titles.add(line[0]);
             }
             fileReader.close();
@@ -139,7 +143,7 @@ public class ViewHistory {
             FileWriter writer = new FileWriter(filename, true);
             for (Book book : historyStack) {
                 if (!titles.contains(book.getTitle())) {
-                    writer.write(book.getTitle() + "\n");
+                    writer.write(book.getTitle() + "," + book.getPersonalRating() + "\n");
                 }
             }
             writer.close();

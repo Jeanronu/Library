@@ -18,6 +18,9 @@ public class SearchBooks {
      */
     public static ArrayList<Book> titleSearch(String tit, ArrayList<Book> library, LinkedBinarySearchTreeBook<ArrayList<Book>> orgByTitleTree)  {
         ArrayList<Book> orgByTitle = orgByTitleTree.getRootList(); // arraylist of books with the title from the sorted title tree
+        if (orgByTitle == null) {
+            return null;
+        }
         Book current = orgByTitle.get(0);
         tit = tit.toLowerCase();
         if (orgByTitleTree.isEmpty()) {
@@ -43,6 +46,9 @@ public class SearchBooks {
      */
     public static ArrayList<Book> authorSearch(String aut, ArrayList<Book> library, LinkedBinarySearchTreeBook<ArrayList<Book>> orgByAuthorTree){
         ArrayList<Book> orgByAuthor = orgByAuthorTree.getRootList(); // Will contain the books that have the author searched by the user
+        if (orgByAuthor == null) {
+            return null;
+        }
         Book current = orgByAuthor.get(0);
         String[] arr = aut.toLowerCase().split(" "); // Array of author full name, will use last item in array as last name
         String other = current.getAuthors()[0].toLowerCase();
@@ -77,6 +83,9 @@ public class SearchBooks {
      */
     public static ArrayList<Book> categorySearch(String cat, ArrayList<Book> library, LinkedBinarySearchTreeBook<ArrayList<Book>> orgByCatTree){
         ArrayList<Book> orgByCategory = orgByCatTree.getRootList(); // Will contain the books that have the category searched by the user
+        if (orgByCategory == null) {
+            return null;
+        }
         Book current = orgByCategory.get(0);
         cat = cat.toLowerCase();
         if (orgByCatTree.isEmpty()){
