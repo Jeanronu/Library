@@ -33,11 +33,11 @@ public class Matrix {
      * @param v The vector which will be represented as a matrix
      */
     public Matrix(Vector v) {
-        this.matrix = new double[v.size][1];
-        for (int i = 0; i < v.size; i++) {
+        this.matrix = new double[v.getSize()][1];
+        for (int i = 0; i < v.getSize(); i++) {
             addValue(i,0,v.getValue(i)); //Adds the values of the vector to a matrix
         }
-        this.rows = v.size;
+        this.rows = v.getSize();
         this.columns = 1;
     }
 
@@ -48,7 +48,7 @@ public class Matrix {
      * so the program throws an exception
      */
     public Matrix(Vector[] vectors) throws IllegalArgumentException{
-        int size = vectors[0].size;
+        int size = vectors[0].getSize();
         for (Vector vector : vectors) {
             if (vector.getSize() != size) {
                 throw new IllegalArgumentException("Vectors must have the same number of rows!");
@@ -56,11 +56,11 @@ public class Matrix {
         }
         this.matrix = new double[size][vectors.length]; //Creates a matrix given vector dimensions and numbers
         for (int i = 0; i < vectors.length; i++) {
-            for (int j = 0; j < vectors[i].size; j++) {
+            for (int j = 0; j < vectors[i].getSize(); j++) {
                 addValue(j,i,vectors[i].getValue(j));
             }
         }
-        this.rows = vectors[0].size;
+        this.rows = vectors[0].getSize();
         this.columns = vectors.length;
     }
 

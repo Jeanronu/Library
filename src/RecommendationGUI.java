@@ -8,7 +8,8 @@ import java.util.Objects;
 
 /**
  * @author Jean Rojas
- * A GUI class for displaying the books that the program recommendto the user based on the books they have read.
+ * A GUI class for displaying the books that the program recommendto the
+ * user based on the books they have read.
  */
 public class RecommendationGUI<T> extends JFrame {
     private RecommendationHeap<T> heap;
@@ -214,6 +215,7 @@ public class RecommendationGUI<T> extends JFrame {
             }
         });
 
+        // Add the element to the panel
         topPanel.add(recommendLabel, BorderLayout.NORTH);
         menuPanel.add(menuBox, BorderLayout.SOUTH);
         menuPanel.add(searchField, BorderLayout.SOUTH);
@@ -236,7 +238,6 @@ public class RecommendationGUI<T> extends JFrame {
 
     /**
      * Displays the list of books in a table format using a JOptionPane.
-     *
      * @param books the list of books to be displayed in the table
      */
     public void displayBooksTable(ArrayList<Book> books) {

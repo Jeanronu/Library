@@ -14,6 +14,12 @@ public class BookDisplay {
     private JTextArea bookDescription;
     private static Book book;
 
+    /**
+     * @author Jean & Eva
+     * Constructs a new BookDisplay object that displays information about the specified Book object.
+     * @param book The Book object to display information about.
+     * @throws IOException If an error occurs while loading the book's cover image.
+     */
     public BookDisplay(Book book) throws IOException {
         this.book = book;
         rootPanel = new JPanel();
@@ -60,6 +66,7 @@ public class BookDisplay {
             ImageIcon icon = new ImageIcon(image.getScaledInstance(100, height, Image.SCALE_SMOOTH));
             bookImage.setIcon(icon);
         } catch (MalformedURLException ex) {
+            // If the book's thumbnail URL is invalid, display a default "not found" image.
             URL invimageUrl = new URL("https://th.bing.com/th/id/R.543d6deeaf347069284e4b50a382c43d?rik=%2fhJ4nntH8qf0ow&riu=http%3a%2f%2fegyptianstreets.com%2fwp-content%2fuploads%2f2017%2f07%2f404.jpg&ehk=GmgY30HfAgjnFyI%2ffugEffJ11Tv%2bc8G6%2bCVUtin8EKo%3d&risl=&pid=ImgRaw&r=0");
             Image invimage = ImageIO.read(invimageUrl);
             int height = 150;
@@ -70,10 +77,16 @@ public class BookDisplay {
         }
     }
 
+    /**
+     * @return the root panel
+     */
     public JPanel getRootPanel() {
         return rootPanel;
     }
 
+    /**
+     * @return the book
+     */
     public static Book getBook() {
         return book;
     }

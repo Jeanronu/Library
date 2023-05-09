@@ -1,3 +1,8 @@
+/**
+ * Test main it does not do anything
+ * DO NOT DELETE THIS FILE
+ */
+
 import java.awt.image.AreaAveragingScaleFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -44,6 +49,13 @@ public class Main {
 //        System.out.println(categories.get(5)); // prints the first book in the array returned by categorySearch
 
     }
+
+
+    /**
+     Returns a random Book object from the specified Library object.
+     @param library The Library object to select a random book from.
+     @return A randomly selected Book object from the Library.
+     */
 
     public static Book randomBook(Library library) {
         int randomIndex = (int) (Math.random() * library.getSize());

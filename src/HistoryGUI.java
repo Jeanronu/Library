@@ -5,11 +5,11 @@ import java.awt.event.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @author Jean Rojas
- A GUI class for displaying the history of the books that the user has borrowed or returned.
+ * A GUI class for displaying the history of the books that the user
+ * has read.
  */
 
 public class HistoryGUI extends JFrame {

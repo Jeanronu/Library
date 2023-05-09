@@ -1,4 +1,5 @@
 /**
+ * @author Jean Rojas
  * This class represents a view history for a collection of books.
  * It keeps track of the books that have been viewed and provides methods to add, clear, and retrieve book history.
  */

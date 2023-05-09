@@ -27,6 +27,7 @@ public class SearchGUI extends JFrame {
         protitle.setHorizontalAlignment(JLabel.CENTER);
         protitle.setFont(new Font("Arial", Font.BOLD, 24));
         protitle.setHorizontalAlignment(JLabel.CENTER);
+        history = new ViewHistory("book_history.csv");
 
         // Create a panel for the menu and search components
         JPanel menuPanel = new JPanel();
