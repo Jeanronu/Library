@@ -1,6 +1,6 @@
+
 import javax.swing.*;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -15,78 +15,66 @@ import java.util.ArrayList;
  * @param <T> The ArrayHeap can technically hold any comparable datatype, but it will be used with BookNodes
  */
 public class RecommendationHeap<T> extends ArrayHeap {
-    private ArrayList<Book> library;
+    private Library library;
     private Vector ratingPredictions;
 
     /**
      * This is a constructor method for the recommendation heap, it calls the methods to do the least-squares
      * prediction model
-     *
-     * @param library     An arrayList of books, which is the library database
-     * @param viewHistory A Stack of books, the view history of the user
+     * @param library An arrayList of books, which is the library database
+     * @param readHistory A Stack of books, the read history of the user
      * @throws FileNotFoundException The method creates BookVectors, which have the potential to throw FileNotFoundExceptions
      * @throws IllegalArgumentException Creates matrices, which have the potential to throw IllegalArgumentExceptions
      */
-    public RecommendationHeap(Library library, Stack<Book> viewHistory) throws IOException, IllegalArgumentException {
-        super();
-        this.library = library.getLibrary(); // get the ArrayList from the Library object
-        if (viewHistory.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "You have not read any book so far so we cannot recommend any books. For us can recommend books to you, you have to read at least 23 books <3");
-            JFrame frame = new JFrame("iLibrary");
-            HomePageGUI homePage = new HomePageGUI(frame);
-            frame.setContentPane(homePage.getContentPane());
-            frame.pack();
-            frame.setVisible(true);
-            return;
-        }
-        ArrayList<Book> readBooks = getHistory(viewHistory);
-        calculatePotentialRatings(readBooks);
-        loadValues();
+    public RecommendationHeap(Library library, Stack<Book> readHistory) throws FileNotFoundException, IllegalArgumentException {
+        super(); //Creates a heap
+        this.library = library;
+        ArrayList<Book> readBooks = getHistory(readHistory); //Adds books from the stack history to an ArrayList
+        calculatePotentialRatings(readBooks); //Find the potential rating vector
+        loadValues(); //Adds each BookNode with its potential rating to the ArrayHeap
     }
 
     /**
      * Gets the read Books from the Stack, then returns them in the correct order
-     *
-     * @param viewHistory The Stack which contains view history
-     * @return An ArrayList of Books which contains view history
+     * @param readHistory The Stack which contains readHistory
+     * @return An ArrayList of Books which contains readHistory
      */
-    public ArrayList<Book> getHistory(Stack<Book> viewHistory) {
-        ArrayList<Book> viewBooks = new ArrayList<>();
+    public ArrayList<Book> getHistory(Stack<Book> readHistory) {
+        ArrayList<Book> readBooks = new ArrayList<>();
         Stack<Book> temp = new Stack<>(); //Temporary stack in reverse order
-        while (!viewHistory.isEmpty()) { //Move books from this stack
-            Book book = viewHistory.peek();
-            viewHistory.pop();
-            viewBooks.add(book); //Add the book to the ArrayList
+        while (!readHistory.isEmpty()) { //Move books from this stack
+            Book book = readHistory.peek();
+            readHistory.pop();
+            readBooks.add(book); //Add the book to the ArrayList
             temp.push(book); //Add book to the temporary stack
         }
         while (!temp.isEmpty()) { //Return books to the original stack
             Book book = temp.peek();
             temp.pop();
-            viewHistory.push(book);
+            readHistory.push(book);
         }
-        return viewBooks;
+        return readBooks;
     }
 
     /**
      * This creates Vector which should predict how likely the user is to like a book based on its characteristics
+     * Will add random books with random ratings in order for the program to work if the user has not rated enough books
      * @param readBooks A list of books that the user has read
      * @throws FileNotFoundException Creating BookVectors has the potential to throw an exception if the common words file is not found
-     * @throws IllegalArgumentException If the matrix is not invertible, the program will not work. Or, if the user has not
-     *                                  marked enough books as read before calling
+     * @throws IllegalArgumentException If the matrix is not invertible, the program will not work.
      */
-    public void calculatePotentialRatings(ArrayList<Book> readBooks) throws IOException, IllegalArgumentException {
+    public void calculatePotentialRatings(ArrayList<Book> readBooks) throws FileNotFoundException, IllegalArgumentException {
         int size = readBooks.size();
         if (size < 22) {
-            int numToAdd = 22 - size;
-            System.out.println("Please rate more books before using this method! Adding " + numToAdd + " random books.");
-            Library library = new Library(new String[]{"Book_data/Book1.csv"});
-            for (int i = 0; i < numToAdd; i++) {
+            while (readBooks.size() < 22) {
                 Book book = Main.randomBook(library);
                 book.setRead();
                 book.setPersonalRating((int) (Math.random() * 5));
                 readBooks.add(book);
             }
+            JOptionPane.showMessageDialog(null, "You have not read enough books, but these ones can interest you.");
         }
+        size = readBooks.size();
         Vector ratings = new Vector(size); //Create a Vector to hold the user's ratings of the book
         //This matrix will technically be the transpose of the matrix that is designated A,
         //because of the way that I conceptualize vectors
@@ -119,7 +107,7 @@ public class RecommendationHeap<T> extends ArrayHeap {
      * @throws FileNotFoundException Creating BookVectors can throw an exception
      */
     public void loadValues() throws FileNotFoundException {
-        for (Book book : library) {
+        for (Book book : library.getLibrary()) {
             if (!book.isRead()) { //Only want to add unread books
                 BookVector bookVector = new BookVector(book);
                 //The potential rating for the book will be the constant from the prediction vector
@@ -139,14 +127,9 @@ public class RecommendationHeap<T> extends ArrayHeap {
     public ArrayList<Book> getRecommendations(int size) {
         ArrayList<Book> books = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            BookNode max = (BookNode) this.removeMax(); // Remove the max
-            if (max != null) {
-                books.add(max.getBook()); // Add to the list
-            } else {
-                break; // Stop if there are no more nodes
-            }
+            BookNode max = (BookNode) this.removeMax(); //Remove the max
+            books.add(max.getBook()); //Add to the list
         }
         return books;
     }
-
 }
