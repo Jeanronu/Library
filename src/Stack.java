@@ -2,6 +2,7 @@ import java.util.EmptyStackException;
 import java.util.Iterator;
 
 /**
+ * @author Jean Rojas
  This class represents a generic stack data structure that stores elements of type T.
  It supports standard stack operations such as push, pop, peek, and isEmpty.
  It also implements Iterable<T> interface to enable the use of for-each loop to iterate over the elements in the stack.

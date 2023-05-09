@@ -1,4 +1,5 @@
 /**
+ * @author Eva ackley
  * PriorityQueue interface represents a collection of elements that are maintained in a certain order
  * and can be accessed according to their priority. The elements must implement the Comparable interface
  * in order to be compared to each other.

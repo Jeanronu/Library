@@ -59,8 +59,6 @@ public class HomePageGUI {
                         recommendationWindow.setVisible(true);
                     } catch (FileNotFoundException ex) {
                         ex.printStackTrace();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
                     }
                 }
             }
